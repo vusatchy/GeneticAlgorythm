@@ -83,7 +83,7 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             population = populationManager.mutateAndSelect(mutationPossibility, selectionPossibility);
             double tempResult = bestSolution(population);
 
-            LOGGER.info("Population {} result {}", populationManager.lastPopulationIndex(), tempResult);
+            LOGGER.info("Population № {} best population result: {}", populationManager.lastPopulationIndex(), tempResult);
 
             if (tempResult > bestSolution) {
                 count = 0;
