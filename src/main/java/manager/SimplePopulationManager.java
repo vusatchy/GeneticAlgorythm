@@ -7,7 +7,6 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SimplePopulationManager implements PopulationManager {
 
@@ -78,7 +77,7 @@ public class SimplePopulationManager implements PopulationManager {
         return populations.get(0);
     }
 
-    private static Pair<BitEntity, BitEntity> mergeEntities(BitEntity parent1, BitEntity parent2, int borderIndex) {
+    Pair<BitEntity, BitEntity> mergeEntities(BitEntity parent1, BitEntity parent2, int borderIndex) {
         int[] child1 = new int[0];
         int[] child2 = new int[0];
         child1 = ArrayUtils.addAll(child1, ArrayUtils.subarray(parent1.getBits(), 0, borderIndex));
@@ -91,12 +90,4 @@ public class SimplePopulationManager implements PopulationManager {
         return Pair.create(new BitEntity(child1), new BitEntity(child2));
     }
 
-    public static void main(String[] args) {
-        BitEntity parent1 = new BitEntity(new int[]{1, 2, 3, 4, 5});
-        BitEntity parent2 = new BitEntity(new int[]{6, 7, 8, 9, 0});
-        int borderIndex = 2;
-        Pair<BitEntity, BitEntity> crossed = mergeEntities(parent1, parent2, borderIndex);
-        System.out.println(Arrays.stream(crossed.getFirst().getBits()).boxed().map(Object::toString).collect(Collectors.joining()));
-        System.out.println(Arrays.stream(crossed.getSecond().getBits()).boxed().map(Object::toString).collect(Collectors.joining()));
-    }
 }
