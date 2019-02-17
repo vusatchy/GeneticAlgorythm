@@ -1,15 +1,22 @@
 package service;
 
 import evaluation.Evaluator;
+import manager.PopulationManager;
+import manager.SimplePopulationManager;
 import model.BitEntity;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.math3.linear.*;
 import org.apache.commons.math3.util.FastMath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.util.List;
 import java.util.Objects;
 
 public class GeneticAlgorithmService implements GeneticAlgorythm {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneticAlgorithmService.class);
 
     private int populationSize = 100;
 
@@ -19,13 +26,15 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
 
     private long splittingSize = (long) (3 * Math.pow(10, 6));
 
+    private int timesWithoutChanges = 20;
+
     private Range<Double> range = Range.between(0d, 1d);
 
     private Range<Double> recalculatedRange;
 
     private Evaluator evaluator;
 
-    private SimplePopulationManager populationManager;
+    private PopulationManager populationManager;
 
     private int n;
 
@@ -64,9 +73,35 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
         this.b = solution.getEntry(1);
     }
 
-    public List<BitEntity> findBestPopulation() {
-        populationManager.mutateAndSelect(mutationPossibility, selectionPossibility);
-        return null;
+    @Override
+    public double findBestSolution() {
+        double bestSolution;
+        int count = 0;
+        List<BitEntity> population = populationManager.initialPopulation();
+        bestSolution = bestSolution(population);
+        while (true) {
+            population = populationManager.mutateAndSelect(mutationPossibility, selectionPossibility);
+            double tempResult = bestSolution(population);
+
+            LOGGER.info("Population {} result {}", populationManager.lastPopulationIndex(), tempResult);
+
+            if (tempResult > bestSolution) {
+                count = 0;
+                bestSolution = tempResult;
+            } else if (count == timesWithoutChanges) {
+                break;
+            } else {
+                count++;
+            }
+        }
+        return bestSolution;
+    }
+
+    private double bestSolution(List<BitEntity> population) {
+        return population.stream()
+                .mapToDouble(entity -> evaluator.evaluate(entity, k, b))
+                .max()
+                .getAsDouble();
     }
 
     public static AlgorithmBuilder newAlgorithmBuilder() {
@@ -91,6 +126,11 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
 
         public AlgorithmBuilder withSelectionPossibility(double selectionPossibility) {
             GeneticAlgorithmService.this.selectionPossibility = selectionPossibility;
+            return this;
+        }
+
+        public AlgorithmBuilder withTimesWithoutChanges(int timesWithoutChanges) {
+            GeneticAlgorithmService.this.timesWithoutChanges = timesWithoutChanges;
             return this;
         }
 

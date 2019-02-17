@@ -1,4 +1,4 @@
-package service;
+package manager;
 
 import model.BitEntity;
 import org.apache.commons.lang3.ArrayUtils;
@@ -9,7 +9,7 @@ import org.apache.commons.math3.util.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SimplePopulationManager {
+public class SimplePopulationManager implements PopulationManager {
 
     private Map<Integer, List<BitEntity>> populations = new HashMap<>();
     private int populationSize;
@@ -30,12 +30,13 @@ public class SimplePopulationManager {
         this.populations.put(0, entities);
     }
 
-    public void mutateAndSelect(double mutationPossibility, double selectionPossibility) {
+    @Override
+    public List<BitEntity> mutateAndSelect(double mutationPossibility, double selectionPossibility) {
         int lastPopulationIndex = populations.keySet().stream().mapToInt(x -> x).max().getAsInt();
         List<BitEntity> lastPopulation = populations.get(lastPopulationIndex);
         BitEntity[] newPopulation = new BitEntity[populationSize];
         int step = this.populationSize / 2;
-        for (int i = 0; i < step - 1; i++) {
+        for (int i = 0; i < step; i++) {
             BitEntity parent1 = lastPopulation.get(i);
             BitEntity parent2 = lastPopulation.get(i + step);
             BitEntity child1;
@@ -53,7 +54,7 @@ public class SimplePopulationManager {
             }
 
             //mutate
-            if (selectionPossibility < Math.random()) {
+            if (mutationPossibility < Math.random()) {
                 child1.mutate();
                 child2.mutate();
             }
@@ -62,6 +63,19 @@ public class SimplePopulationManager {
             newPopulation[i + step] = child2;
         }
         populations.put(lastPopulationIndex + 1, Arrays.asList(newPopulation));
+        return Arrays.asList(newPopulation);
+    }
+
+    @Override
+    public int lastPopulationIndex() {
+        return populations.keySet().stream()
+                .mapToInt(val -> val)
+                .max().getAsInt();
+    }
+
+    @Override
+    public List<BitEntity> initialPopulation() {
+        return populations.get(0);
     }
 
     private static Pair<BitEntity, BitEntity> mergeEntities(BitEntity parent1, BitEntity parent2, int borderIndex) {
