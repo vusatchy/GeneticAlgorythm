@@ -1,5 +1,6 @@
 package manager;
 
+import choose.Chooser;
 import model.BitEntity;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -11,12 +12,14 @@ import java.util.*;
 public class SimplePopulationManager implements PopulationManager {
 
     private Map<Integer, List<BitEntity>> populations = new HashMap<>();
+    private Chooser chooser;
     private int populationSize;
     private int n;
 
-    public SimplePopulationManager(int populationSize, int n) {
+    public SimplePopulationManager(Chooser chooser, int populationSize, int n) {
         this.populationSize = populationSize;
         this.n = n;
+        this.chooser = chooser;
         init();
     }
 
@@ -33,11 +36,10 @@ public class SimplePopulationManager implements PopulationManager {
     public List<BitEntity> mutateAndSelect(double mutationPossibility, double selectionPossibility) {
         int lastPopulationIndex = populations.keySet().stream().mapToInt(x -> x).max().getAsInt();
         List<BitEntity> lastPopulation = populations.get(lastPopulationIndex);
-        BitEntity[] newPopulation = new BitEntity[populationSize];
-        int step = this.populationSize / 2;
-        for (int i = 0; i < step; i++) {
-            BitEntity parent1 = lastPopulation.get(i);
-            BitEntity parent2 = lastPopulation.get(i + step);
+        List<BitEntity> newPopulation = new ArrayList<>();
+        for (int i = 0; i < populationSize; i++) {
+            BitEntity parent1 = chooser.choose(lastPopulation);
+            BitEntity parent2 = chooser.choose(lastPopulation);
             BitEntity child1;
             BitEntity child2;
             //merge
@@ -58,11 +60,11 @@ public class SimplePopulationManager implements PopulationManager {
                 child2.mutate();
             }
 
-            newPopulation[i] = child1;
-            newPopulation[i + step] = child2;
+            newPopulation.add(child1);
+            newPopulation.add(child2);
         }
-        populations.put(lastPopulationIndex + 1, Arrays.asList(newPopulation));
-        return Arrays.asList(newPopulation);
+        populations.put(lastPopulationIndex + 1, newPopulation);
+        return newPopulation;
     }
 
     @Override

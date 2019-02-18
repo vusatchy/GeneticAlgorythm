@@ -1,5 +1,6 @@
 package manager;
 
+import choose.SimpleMaxOfRandomTwoChooser;
 import model.BitEntity;
 import org.apache.commons.math3.util.Pair;
 import org.junit.Test;
@@ -8,7 +9,7 @@ import static org.junit.Assert.assertArrayEquals;
 
 public class SimplePopulationManagerTest {
 
-    private SimplePopulationManager populationManager = new SimplePopulationManager(100, 5);
+    private SimplePopulationManager populationManager = new SimplePopulationManager(new SimpleMaxOfRandomTwoChooser(), 100, 5);
 
 
     @Test

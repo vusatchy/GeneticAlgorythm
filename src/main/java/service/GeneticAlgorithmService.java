@@ -1,5 +1,7 @@
 package service;
 
+import choose.Chooser;
+import choose.SimpleMaxOfRandomTwoChooser;
 import evaluation.Evaluator;
 import manager.PopulationManager;
 import manager.SimplePopulationManager;
@@ -29,6 +31,8 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
     private int timesWithoutChanges = 20;
 
     private Range<Double> range = Range.between(0d, 1d);
+
+    private Chooser chooser = new SimpleMaxOfRandomTwoChooser();
 
     private Range<Double> recalculatedRange;
 
@@ -119,8 +123,8 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             return this;
         }
 
-        public AlgorithmBuilder withMutationPossility(double mutationPossiblity) {
-            GeneticAlgorithmService.this.mutationPossibility = mutationPossiblity;
+        public AlgorithmBuilder wihtMutationPossibility(double mutationPossibility) {
+            GeneticAlgorithmService.this.mutationPossibility = mutationPossibility;
             return this;
         }
 
@@ -149,6 +153,11 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             return this;
         }
 
+        public AlgorithmBuilder withChooser(Chooser chooser) {
+            GeneticAlgorithmService.this.chooser = chooser;
+            return this;
+        }
+
         public GeneticAlgorithmService build() {
             GeneticAlgorithmService geneticAlgorithmService = GeneticAlgorithmService.this;
             if (geneticAlgorithmService.evaluator == null) {
@@ -156,10 +165,9 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             }
             geneticAlgorithmService.recalculateRange();
             geneticAlgorithmService.calculateTransformationCoefficients();
-            geneticAlgorithmService.populationManager = new SimplePopulationManager(geneticAlgorithmService.populationSize, geneticAlgorithmService.n);
+            geneticAlgorithmService.populationManager = new SimplePopulationManager(chooser, geneticAlgorithmService.populationSize, geneticAlgorithmService.n);
             return geneticAlgorithmService;
         }
-
     }
 
     @Override

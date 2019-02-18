@@ -1,3 +1,4 @@
+import choose.SimpleMaxOfRandomTwoChooser;
 import evaluation.SimpleEvaluator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +18,13 @@ public class App {
     public static void main(String[] args) {
         GeneticAlgorythm geneticAlgorithm = GeneticAlgorithmService.newAlgorithmBuilder()
                 .withPopulationSize(100)
-                .withMutationPossility(0.01)
+                .wihtMutationPossibility(0.01)
                 .withSelectionPossibility(0.8)
                 .withRange(-1, 2)
                 .withSplittingSize((long) (3 * Math.pow(10, 6)))
                 .withTimesWithoutChanges(100)
                 .withEvaluator(new SimpleEvaluator(function()))
+                .withChooser(new SimpleMaxOfRandomTwoChooser())
                 .build();
 
         double results = geneticAlgorithm.findBestSolution();
