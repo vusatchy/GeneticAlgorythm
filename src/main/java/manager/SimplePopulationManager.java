@@ -34,6 +34,7 @@ public class SimplePopulationManager implements PopulationManager {
 
     @Override
     public List<BitEntity> mutateAndSelect(double mutationPossibility, double selectionPossibility) {
+        Random random = new Random();
         int lastPopulationIndex = populations.keySet().stream().mapToInt(x -> x).max().getAsInt();
         List<BitEntity> lastPopulation = populations.get(lastPopulationIndex);
         List<BitEntity> newPopulation = new ArrayList<>();
@@ -42,10 +43,10 @@ public class SimplePopulationManager implements PopulationManager {
             BitEntity parent2 = chooser.choose(lastPopulation);
             BitEntity child1;
             BitEntity child2;
+
             //merge
             if (selectionPossibility < Math.random()) {
-                int borderIndex = RandomUtils.nextInt(1, this.n);
-                Pair<BitEntity, BitEntity> merged = mergeEntities(parent1, parent2, borderIndex);
+                Pair<BitEntity, BitEntity> merged = mergeEntities(parent1, parent2, random.nextInt(this.n));
                 child1 = merged.getFirst();
                 child2 = merged.getSecond();
 
