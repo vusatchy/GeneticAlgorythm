@@ -1,20 +1,21 @@
 package service;
 
 import choose.Chooser;
-import choose.SimpleMaxOfRandomTwoChooser;
 import evaluation.Evaluator;
 import manager.PopulationManager;
 import manager.SimplePopulationManager;
 import model.BitEntity;
 import org.apache.commons.lang3.Range;
-import org.apache.commons.math3.linear.*;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class GeneticAlgorithmService implements GeneticAlgorythm {
 
@@ -26,25 +27,19 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
 
     private double selectionPossibility = 0.8;
 
-    private long splittingSize = (long) (3 * Math.pow(10, 6));
+    private long splittingSize = (long) Math.pow(10, 6);
 
     private int timesWithoutChanges = 20;
 
-    private Range<Double> range = Range.between(0d, 1d);
+    private List<Range<Double>> ranges = Collections.singletonList(Range.between(0d, 1d));
 
-    private Chooser chooser = new SimpleMaxOfRandomTwoChooser();
-
-    private Range<Double> recalculatedRange;
+    private Chooser chooser;
 
     private Evaluator evaluator;
 
     private PopulationManager populationManager;
 
-    private int n;
-
-    private double k;
-
-    private double b;
+    private List<Integer> dimensions = new ArrayList<>();
 
 
     public GeneticAlgorithmService() {
@@ -52,60 +47,59 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
     }
 
     private void recalculateRange() {
-        double rightBorder = FastMath.log(2, splittingSize);
-        rightBorder = FastMath.floor(rightBorder) + 1;
-        this.n = (int) rightBorder;
-        this.recalculatedRange = Range.between(0d, FastMath.pow(2, rightBorder) - 1);
-    }
-
-    private void calculateTransformationCoefficients() {
-        RealMatrix coefficients = new Array2DRowRealMatrix(new double[][]{
-                {recalculatedRange.getMinimum(), 1},
-                {recalculatedRange.getMaximum(), 1}},
-                false);
-
-        DecompositionSolver solver = new LUDecomposition(coefficients).getSolver();
-
-        RealVector constants = new ArrayRealVector(new double[]{
-                range.getMinimum(),
-                range.getMaximum()},
-                false);
-
-        RealVector solution = solver.solve(constants);
-
-        this.k = solution.getEntry(0);
-        this.b = solution.getEntry(1);
+        for (Range<Double> range : ranges) {
+            double rightBorder = FastMath.log(2, (range.getMaximum() - range.getMinimum()) * splittingSize);
+            rightBorder = FastMath.floor(rightBorder) + 1;
+            dimensions.add((int) rightBorder);
+        }
     }
 
     @Override
-    public double findBestSolution() {
-        double bestSolution;
+    public Triple<Integer, Double, BitEntity> findBestSolution() {
         int count = 0;
         List<BitEntity> population = populationManager.initialPopulation();
-        bestSolution = bestSolution(population);
+        Pair<Double, BitEntity> doubleBitEntityPair = bestSolution(population);
+        int bestPopulation = populationManager.lastPopulationIndex();
+        double bestSolution = doubleBitEntityPair.getLeft();
+        BitEntity bitEntity = doubleBitEntityPair.getRight();
         while (true) {
             population = populationManager.mutateAndSelect(mutationPossibility, selectionPossibility);
-            double tempResult = bestSolution(population);
+            doubleBitEntityPair = bestSolution(population);
+            double tempResult = doubleBitEntityPair.getLeft();
 
             LOGGER.info("Population № {} best population result: {}", populationManager.lastPopulationIndex(), tempResult);
 
-            if (tempResult > bestSolution) {
+            if (tempResult < bestSolution) {
                 count = 0;
                 bestSolution = tempResult;
+                bestPopulation = populationManager.lastPopulationIndex();
+                bitEntity = doubleBitEntityPair.getRight();
             } else if (count == timesWithoutChanges) {
                 break;
             } else {
                 count++;
             }
         }
-        return bestSolution;
+        return Triple.of(bestPopulation, bestSolution, bitEntity);
     }
 
-    private double bestSolution(List<BitEntity> population) {
-        return population.stream()
-                .mapToDouble(entity -> evaluator.evaluate(entity, k, b))
-                .max()
-                .getAsDouble();
+    @Override
+    public List<Double> convert(BitEntity bitEntity) {
+        return evaluator.convert(bitEntity, ranges);
+    }
+
+
+    private Pair<Double, BitEntity> bestSolution(List<BitEntity> population) {
+        BitEntity entity = population.get(0);
+        double min = evaluator.evaluate(entity, ranges);
+        for (int i = 1; i < population.size(); i++) {
+            double result = evaluator.evaluate(population.get(i), ranges);
+            if (result < min) {
+                min = result;
+                entity = population.get(i);
+            }
+        }
+        return Pair.of(min, entity);
     }
 
     public static AlgorithmBuilder newAlgorithmBuilder() {
@@ -138,8 +132,8 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             return this;
         }
 
-        public AlgorithmBuilder withRange(double a, double b) {
-            GeneticAlgorithmService.this.range = Range.between(a, b);
+        public AlgorithmBuilder withRanges(List<Range<Double>> ranges) {
+            GeneticAlgorithmService.this.ranges = ranges;
             return this;
         }
 
@@ -163,29 +157,12 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             if (geneticAlgorithmService.evaluator == null) {
                 throw new RuntimeException("Evaluator not selected");
             }
+            chooser.setRanges(ranges);
             geneticAlgorithmService.recalculateRange();
-            geneticAlgorithmService.calculateTransformationCoefficients();
-            geneticAlgorithmService.populationManager = new SimplePopulationManager(chooser, geneticAlgorithmService.populationSize, geneticAlgorithmService.n);
+            geneticAlgorithmService.populationManager = new SimplePopulationManager(chooser, geneticAlgorithmService.populationSize, geneticAlgorithmService.dimensions);
             return geneticAlgorithmService;
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GeneticAlgorithmService that = (GeneticAlgorithmService) o;
-        return populationSize == that.populationSize &&
-                Double.compare(that.mutationPossibility, mutationPossibility) == 0 &&
-                Double.compare(that.selectionPossibility, selectionPossibility) == 0 &&
-                splittingSize == that.splittingSize &&
-                Objects.equals(range, that.range) &&
-                Objects.equals(recalculatedRange, that.recalculatedRange);
-    }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(populationSize, mutationPossibility, selectionPossibility, splittingSize, range, recalculatedRange);
-    }
 }

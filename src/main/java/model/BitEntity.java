@@ -2,44 +2,65 @@ package model;
 
 import org.apache.commons.lang3.RandomUtils;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class BitEntity implements Cloneable {
 
-    private int[] bits;
+    private List<List<Integer>> bitsHolder = new ArrayList<>();
 
-    public BitEntity(int size) {
-        this.bits = new int[size];
-        populate();
+
+    public BitEntity() {
+
     }
 
-    public BitEntity(int[] bits) {
-        this.bits = bits;
+    public BitEntity(List<Integer> dimensions) {
+        populate(dimensions);
     }
 
-    private void populate() {
-        for (int i = 0; i < bits.length; i++) {
-            bits[i] = RandomUtils.nextBoolean() ? 1 : 0;
+    public static BitEntity of(List<List<Integer>> bitsHolder) {
+        BitEntity bitEntity = new BitEntity();
+        bitEntity.bitsHolder = bitsHolder;
+        return bitEntity;
+    }
+
+    private void populate(List<Integer> dimensions) {
+        for (Integer dim : dimensions) {
+            List<Integer> bits = new ArrayList<>();
+            for (int i = 0; i < dim; i++) {
+                bits.add(RandomUtils.nextBoolean() ? 1 : 0);
+            }
+            bitsHolder.add(bits);
         }
     }
 
-    public int[] getBits() {
-        return bits;
-    }
 
-    public double getNumericValue() {
-        double sum = 0;
-        for (int i = 0; i < bits.length; i++) {
-            sum += bits[i] * Math.pow(2, i);
+    public List<Double> getNumericValue() {
+        List<Double> numericValues = new ArrayList<>();
+        for (List<Integer> bits : bitsHolder) {
+            double sum = 0;
+            for (int i = 0; i < bits.size(); i++) {
+                sum += bits.get(i) * Math.pow(2, i);
+            }
+            numericValues.add(sum);
         }
-        return sum;
+        return numericValues;
     }
 
     public void mutate() {
-        int i = RandomUtils.nextInt(0, bits.length);
-        bits[i] = bits[i] == 1 ? 0 : 1;
+        List<Integer> bits = bitsHolder.get(RandomUtils.nextInt(0, bitsHolder.size()));
+        int i = RandomUtils.nextInt(0, bits.size());
+        bits.set(i, bits.get(i) == 1 ? 0 : 1);
     }
 
+    public List<List<Integer>> getBitsHolder() {
+        List<List<Integer>> newBits = new ArrayList<>();
+        for (List<Integer> bits : bitsHolder) {
+            newBits.add(new ArrayList<>(bits));
+        }
+        return newBits;
+    }
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -51,11 +72,12 @@ public class BitEntity implements Cloneable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BitEntity bitEntity = (BitEntity) o;
-        return Arrays.equals(bits, bitEntity.bits);
+        return Objects.equals(bitsHolder, bitEntity.bitsHolder);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(bits);
+
+        return Objects.hash(bitsHolder);
     }
 }

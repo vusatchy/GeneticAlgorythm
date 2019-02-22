@@ -1,8 +1,13 @@
 package evaluation;
 
 import model.BitEntity;
+import org.apache.commons.lang3.Range;
+
+import java.util.List;
 
 public interface Evaluator {
 
-    double evaluate(BitEntity bitEntity, double k, double b);
+    List<Double> convert(BitEntity bitEntity, List<Range<Double>> ranges);
+
+    double evaluate(BitEntity bitEntity, List<Range<Double>> range);
 }
