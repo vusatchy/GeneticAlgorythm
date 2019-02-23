@@ -16,6 +16,14 @@ public class SimpleEvaluator implements Evaluator {
         this.function = function;
     }
 
+    public SimpleEvaluator() {
+
+    }
+
+    @Override
+    public void setFunction(Function<double[], Double> function) {
+        this.function = function;
+    }
 
     @Override
     public List<Double> convert(BitEntity bitEntity, List<Range<Double>> ranges) {

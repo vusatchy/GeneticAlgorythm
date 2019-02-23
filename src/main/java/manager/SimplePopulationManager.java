@@ -4,10 +4,8 @@ import choose.Chooser;
 import com.google.common.primitives.Ints;
 import model.BitEntity;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.math3.util.Pair;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.*;
 
 public class SimplePopulationManager implements PopulationManager {
