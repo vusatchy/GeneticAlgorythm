@@ -41,6 +41,6 @@ public class SimpleEvaluator implements Evaluator {
     //check formula
     @Override
     public double evaluate(BitEntity bitEntity, List<Range<Double>> ranges) {
-        return function.apply(Doubles.toArray(convert(bitEntity, ranges)));
+        return (-1) * function.apply(Doubles.toArray(convert(bitEntity, ranges)));
     }
 }

@@ -17,7 +17,7 @@ public class GeneticResult {
     private Map<Integer, Double> generationResult = new HashMap<>();
 
     public void add(int populationIndex, double tempResult) {
-        generationResult.put(populationIndex, tempResult);
+        generationResult.put(populationIndex, Math.abs(tempResult));
     }
 
     public int getBestPopulation() {

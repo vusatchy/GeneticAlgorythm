@@ -69,9 +69,9 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             doubleBitEntityPair = bestSolution(population);
             double tempResult = doubleBitEntityPair.getLeft();
             int populationIndex = populationManager.lastPopulationIndex();
-            LOGGER.info("Population № {} best population result: {}", populationIndex, tempResult);
+            LOGGER.info("Population № {} best population result: {}", populationIndex, Math.abs(tempResult));
             result.add(populationIndex, tempResult);
-            if (tempResult < result.getBestSolution()) {
+            if (tempResult > result.getBestSolution()) {
                 count = 0;
                 result.setBestSolution(tempResult);
                 result.setBestPopulation(populationIndex);
@@ -93,15 +93,15 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
 
     private Pair<Double, BitEntity> bestSolution(List<BitEntity> population) {
         BitEntity entity = population.get(0);
-        double min = evaluator.evaluate(entity, ranges);
+        double max = evaluator.evaluate(entity, ranges);
         for (int i = 1; i < population.size(); i++) {
             double result = evaluator.evaluate(population.get(i), ranges);
-            if (result < min) {
-                min = result;
+            if (result > max) {
+                max = result;
                 entity = population.get(i);
             }
         }
-        return Pair.of(min, entity);
+        return Pair.of(max, entity);
     }
 
     public static AlgorithmBuilder newAlgorithmBuilder() {

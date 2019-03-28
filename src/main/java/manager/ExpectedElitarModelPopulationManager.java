@@ -1,15 +1,17 @@
 package manager;
 
-import com.google.common.collect.ImmutableList;
 import model.BitEntity;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.math3.util.Pair;
+import util.Roulette;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 
@@ -23,13 +25,12 @@ public class ExpectedElitarModelPopulationManager extends SimplePopulationManage
 
     @Override
     public List<BitEntity> mutateAndSelect(double mutationPossibility, double selectionPossibility) {
-
-        Comparator<BitEntity> comparator  = Comparator.comparingDouble(entity -> chooser.evaluate(entity));
+        Map<BitEntity, Integer> entityCount = new HashMap<>();
+        Comparator<BitEntity> comparator = Comparator.comparingDouble(entity -> chooser.evaluate(entity));
         int lastPopulationIndex = populations.keySet().stream().mapToInt(x -> x).max().getAsInt();
         int amount = (int) (percentOfElitar * populationSize);
-        int times = populationSize - amount;
-
         List<BitEntity> lastPopulation = copyDeep(populations.get(lastPopulationIndex));
+        int times = populationSize - amount;
         List<BitEntity> newPopulation = new CopyOnWriteArrayList<>();
         List<BitEntity> elit = lastPopulation.stream()
                 .sorted(comparator.reversed())
@@ -41,8 +42,24 @@ public class ExpectedElitarModelPopulationManager extends SimplePopulationManage
         CompletableFuture[] tasks = new CompletableFuture[times];
         for (int i = 0; i < times; i++) {
             tasks[i] = runAsync(() -> {
-                BitEntity parent1 = BitEntity.of(chooser.choose(lastPopulation).getBitsHolder());
-                BitEntity parent2 = BitEntity.of(chooser.choose(lastPopulation).getBitsHolder());
+                List<Double> evluated = lastPopulation.stream()
+                        .map(entity -> Math.abs(chooser.evaluate(entity)))
+                        .collect(Collectors.toList());
+                double avg = evluated.stream().mapToDouble(m -> m).average().getAsDouble();
+                Roulette roulette = new Roulette(evluated.stream()
+                        .mapToDouble(v -> v / avg).toArray());
+                int spin1 = RandomUtils.nextInt(0, roulette.spin());
+                int spin2 = RandomUtils.nextInt(0, roulette.spin());
+                BitEntity bitEntity1 = lastPopulation.get(spin1);
+                BitEntity bitEntity2 = lastPopulation.get(spin2);
+                while (evluated.get(spin1) <= 0 && evluated.get(spin2) <= 0) {
+                    spin1 = RandomUtils.nextInt(0, roulette.spin());
+                    spin2 = RandomUtils.nextInt(0, roulette.spin());
+                    bitEntity1 = lastPopulation.get(spin1);
+                    bitEntity2 = lastPopulation.get(spin2);
+                }
+                BitEntity parent1 = BitEntity.of(bitEntity1.getBitsHolder());
+                BitEntity parent2 = BitEntity.of(bitEntity2.getBitsHolder());
                 BitEntity child1;
                 BitEntity child2;
 
@@ -51,6 +68,8 @@ public class ExpectedElitarModelPopulationManager extends SimplePopulationManage
                     Pair<BitEntity, BitEntity> merged = mergeEntities(parent1, parent2);
                     child1 = merged.getFirst();
                     child2 = merged.getSecond();
+                    evluated.set(spin1, evluated.get(spin1) - 1);
+                    evluated.set(spin2, evluated.get(spin2) - 1);
 
                 } else {
                     child1 = BitEntity.of(parent1.getBitsHolder());
@@ -60,9 +79,11 @@ public class ExpectedElitarModelPopulationManager extends SimplePopulationManage
                 //mutate
                 if (mutationPossibility < Math.random()) {
                     child2.mutate();
+                    evluated.set(spin2, evluated.get(spin2) - 0.5);
                 }
                 if (mutationPossibility < Math.random()) {
                     child1.mutate();
+                    evluated.set(spin1, evluated.get(spin1) - 0.5);
                 }
 
                 if (newPopulation.size() != populationSize) {
@@ -79,5 +100,4 @@ public class ExpectedElitarModelPopulationManager extends SimplePopulationManage
         populations.put(lastPopulationIndex + 1, newPopulation);
         return newPopulation;
     }
-
 }

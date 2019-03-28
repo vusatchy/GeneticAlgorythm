@@ -30,7 +30,7 @@ public class SimpleMaxOfRandomTwoChooser implements Chooser {
         Random random = new Random();
         BitEntity entity1 = population.get(random.nextInt(population.size()));
         BitEntity entity2 = population.get(random.nextInt(population.size()));
-        return evaluator.evaluate(entity1, ranges) <= evaluator.evaluate(entity2, ranges)
+        return evaluator.evaluate(entity1, ranges) >= evaluator.evaluate(entity2, ranges)
                 ? entity1 : entity2;
     }
 
