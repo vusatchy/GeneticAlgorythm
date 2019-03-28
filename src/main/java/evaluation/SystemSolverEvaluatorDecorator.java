@@ -16,8 +16,8 @@ public class SystemSolverEvaluatorDecorator implements Evaluator {
     }
 
     @Override
-    public void setFunction(Function<double[], Double> function) {
-        evaluator.setFunction(function);
+        public void setFunction(Function<double[], Double> function) {
+            evaluator.setFunction(function);
     }
 
     @Override

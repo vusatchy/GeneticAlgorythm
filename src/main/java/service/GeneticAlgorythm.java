@@ -1,13 +1,13 @@
 package service;
 
 import model.BitEntity;
-import org.apache.commons.lang3.tuple.Triple;
+import model.GeneticResult;
 
 import java.util.List;
 
 public interface GeneticAlgorythm {
 
-    Triple<Integer, Double, BitEntity> findBestSolution();
+    GeneticResult findBestSolution();
 
     List<Double> convert(BitEntity bitEntity);
 }

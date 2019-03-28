@@ -10,21 +10,19 @@ import java.util.function.Function;
 
 public class SimpleMaxOfRandomTwoChooser implements Chooser {
 
-    private Function<double[], Double> function;
 
-    private List<Range<Double>> range;
+    private List<Range<Double>> ranges;
 
     private Evaluator evaluator;
 
-    public SimpleMaxOfRandomTwoChooser(Function<double[], Double> function, Evaluator evaluator) {
-        this.function = function;
+    public SimpleMaxOfRandomTwoChooser(Evaluator evaluator) {
         this.evaluator = evaluator;
 
     }
 
     @Override
-    public void setRanges(List<Range<Double>> range) {
-        this.range = range;
+    public void setRanges(List<Range<Double>> ranges) {
+        this.ranges = ranges;
     }
 
     @Override
@@ -32,7 +30,12 @@ public class SimpleMaxOfRandomTwoChooser implements Chooser {
         Random random = new Random();
         BitEntity entity1 = population.get(random.nextInt(population.size()));
         BitEntity entity2 = population.get(random.nextInt(population.size()));
-        return evaluator.evaluate(entity1, range) <= evaluator.evaluate(entity2, range)
+        return evaluator.evaluate(entity1, ranges) <= evaluator.evaluate(entity2, ranges)
                 ? entity1 : entity2;
+    }
+
+    @Override
+    public double evaluate(BitEntity bitEntity) {
+        return evaluator.evaluate(bitEntity, ranges);
     }
 }

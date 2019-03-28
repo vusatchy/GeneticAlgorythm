@@ -5,13 +5,12 @@ import evaluation.Evaluator;
 import manager.PopulationManager;
 import manager.SimplePopulationManager;
 import model.BitEntity;
+import model.GeneticResult;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.util.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +40,8 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
 
     private List<Integer> dimensions = new ArrayList<>();
 
+    private int maxIterations;
+
 
     public GeneticAlgorithmService() {
 
@@ -55,32 +56,33 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
     }
 
     @Override
-    public Triple<Integer, Double, BitEntity> findBestSolution() {
+    public GeneticResult findBestSolution() {
+        GeneticResult result = new GeneticResult();
         int count = 0;
         List<BitEntity> population = populationManager.initialPopulation();
         Pair<Double, BitEntity> doubleBitEntityPair = bestSolution(population);
-        int bestPopulation = populationManager.lastPopulationIndex();
-        double bestSolution = doubleBitEntityPair.getLeft();
-        BitEntity bitEntity = doubleBitEntityPair.getRight();
+        result.setBestPopulation(populationManager.lastPopulationIndex());
+        result.setBestSolution(doubleBitEntityPair.getLeft());
+        result.setBitEntity(doubleBitEntityPair.getRight());
         while (true) {
             population = populationManager.mutateAndSelect(mutationPossibility, selectionPossibility);
             doubleBitEntityPair = bestSolution(population);
             double tempResult = doubleBitEntityPair.getLeft();
-
-            LOGGER.info("Population № {} best population result: {}", populationManager.lastPopulationIndex(), tempResult);
-
-            if (tempResult < bestSolution) {
+            int populationIndex = populationManager.lastPopulationIndex();
+            LOGGER.info("Population № {} best population result: {}", populationIndex, tempResult);
+            result.add(populationIndex, tempResult);
+            if (tempResult < result.getBestSolution()) {
                 count = 0;
-                bestSolution = tempResult;
-                bestPopulation = populationManager.lastPopulationIndex();
-                bitEntity = doubleBitEntityPair.getRight();
-            } else if (count == timesWithoutChanges) {
+                result.setBestSolution(tempResult);
+                result.setBestPopulation(populationIndex);
+                result.setBitEntity(doubleBitEntityPair.getRight());
+            } else if (count == timesWithoutChanges || populationIndex > maxIterations) {
                 break;
             } else {
                 count++;
             }
         }
-        return Triple.of(bestPopulation, bestSolution, bitEntity);
+        return result;
     }
 
     @Override
@@ -142,6 +144,11 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             return this;
         }
 
+        public AlgorithmBuilder maxIterations(int maxIterations) {
+            GeneticAlgorithmService.this.maxIterations = maxIterations;
+            return this;
+        }
+
         public AlgorithmBuilder withEvaluator(Evaluator evaluator) {
             GeneticAlgorithmService.this.evaluator = evaluator;
             return this;
@@ -150,7 +157,13 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
         public AlgorithmBuilder withChooser(Chooser chooser) {
             GeneticAlgorithmService.this.chooser = chooser;
             return this;
+
         }
+        public AlgorithmBuilder withPopulationManager(PopulationManager populationManager) {
+            GeneticAlgorithmService.this.populationManager = populationManager;
+            return this;
+        }
+
 
         public GeneticAlgorithmService build() {
             GeneticAlgorithmService geneticAlgorithmService = GeneticAlgorithmService.this;
@@ -159,7 +172,10 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
             }
             chooser.setRanges(ranges);
             geneticAlgorithmService.recalculateRange();
-            geneticAlgorithmService.populationManager = new SimplePopulationManager(chooser, geneticAlgorithmService.populationSize, geneticAlgorithmService.dimensions);
+            geneticAlgorithmService.populationManager.setChooser(chooser);
+            geneticAlgorithmService.populationManager.setPopultaionSize(geneticAlgorithmService.populationSize);
+            geneticAlgorithmService.populationManager.setDimensions(geneticAlgorithmService.dimensions);
+            geneticAlgorithmService.populationManager.init();
             return geneticAlgorithmService;
         }
     }

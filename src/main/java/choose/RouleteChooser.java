@@ -40,7 +40,7 @@ public class RouleteChooser implements Chooser {
 
         double prevProb = 0;
         for (int i = 0; i < values.size(); i++) {
-            double f = -values.get(i) + max;
+            double f = values.get(i) + max;
             double prob = f / sum;
             entityMap.put(Range.between(prevProb, prevProb + prob), population.get(i));
             prevProb += prob;
@@ -59,5 +59,10 @@ public class RouleteChooser implements Chooser {
     @Override
     public void setRanges(List<Range<Double>> ranges) {
         this.ranges = ranges;
+    }
+
+    @Override
+    public double evaluate(BitEntity bitEntity) {
+        return evaluator.evaluate(bitEntity, ranges);
     }
 }

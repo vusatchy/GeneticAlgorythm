@@ -57,6 +57,13 @@
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.googlecode.princeton-java-introduction/introcs -->
+        <dependency>
+            <groupId>com.googlecode.princeton-java-introduction</groupId>
+            <artifactId>introcs</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

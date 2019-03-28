@@ -10,4 +10,6 @@ public interface Chooser {
     BitEntity choose(List<BitEntity> population);
 
     void setRanges(List<Range<Double>> ranges);
+
+    double evaluate(BitEntity bitEntity);
 }
