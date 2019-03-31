@@ -56,7 +56,7 @@ public class App {
                 .withSplittingSize((long) Math.pow(10, 9))
                 .withTimesWithoutChanges(500) //50
                 .maxIterations(2000) //50
-                .withEvaluator(new KPowerEvaluatorDecorator(decorated, 1))
+                .withEvaluator(new KPowerEvaluatorDecorator(decorated, 1.005))
                 .withChooser(new SimpleMaxOfRandomTwoChooser(decorated))
                 .withPopulationManager(new ExpectedElitarModelPopulationManager(0.10))
                 .build();

@@ -45,10 +45,4 @@ public class Exersises {
             Range.between(-5d, 1d)
     );
 
-
-    public static void main(String[] args) {
-        System.out.println(FastMath.pow(1.67, 1.05));
-        System.out.println(Math.pow(-2, 3.1));
-
-    }
 }

@@ -48,13 +48,13 @@ public class ExpectedElitarModelPopulationManager extends SimplePopulationManage
                 double avg = evluated.stream().mapToDouble(m -> m).average().getAsDouble();
                 Roulette roulette = new Roulette(evluated.stream()
                         .mapToDouble(v -> v / avg).toArray());
-                int spin1 = RandomUtils.nextInt(0, roulette.spin());
-                int spin2 = RandomUtils.nextInt(0, roulette.spin());
+                int spin1 = roulette.spin();
+                int spin2 = roulette.spin();
                 BitEntity bitEntity1 = lastPopulation.get(spin1);
                 BitEntity bitEntity2 = lastPopulation.get(spin2);
                 while (evluated.get(spin1) <= 0 && evluated.get(spin2) <= 0) {
-                    spin1 = RandomUtils.nextInt(0, roulette.spin());
-                    spin2 = RandomUtils.nextInt(0, roulette.spin());
+                    spin1 = roulette.spin();
+                    spin2 = roulette.spin();
                     bitEntity1 = lastPopulation.get(spin1);
                     bitEntity2 = lastPopulation.get(spin2);
                 }

@@ -32,6 +32,15 @@ public class KPowerEvaluatorDecorator implements Evaluator {
 
     @Override
     public double evaluate(BitEntity bitEntity, List<Range<Double>> range) {
-        return Math.pow(evaluator.evaluate(bitEntity, range), k);
+        return pow(evaluator.evaluate(bitEntity, range), k);
+    }
+
+    private double pow(double base, double exp) {
+        int aftercoma = Integer.valueOf(String.valueOf(exp).split("[.]")[1]);
+        if (base < 0 && exp != 1) {
+            return  Math.pow(Math.abs(base), exp) * (aftercoma % 2 == 0 ? 1 : -1);
+        } else {
+            return Math.pow(base, exp);
+        }
     }
 }
