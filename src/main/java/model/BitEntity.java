@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class BitEntity implements Cloneable {
+public class BitEntity implements Cloneable, Entity {
 
     private List<List<Integer>> bitsHolder = new ArrayList<>();
 
@@ -17,6 +17,18 @@ public class BitEntity implements Cloneable {
 
     public BitEntity(List<Integer> dimensions) {
         populate(dimensions);
+    }
+
+    public static BitEntity of(BitEntity bitEnt) {
+        BitEntity bitEntity = new BitEntity();
+        bitEntity.bitsHolder = bitEnt.getBitsHolder();
+        return bitEntity;
+    }
+
+    public static BitEntity of(Entity bitEnt) {
+        BitEntity bitEntity = new BitEntity();
+        bitEntity.bitsHolder = ((BitEntity) bitEnt).getBitsHolder();
+        return bitEntity;
     }
 
     public static BitEntity of(List<List<Integer>> bitsHolder) {
@@ -36,6 +48,7 @@ public class BitEntity implements Cloneable {
     }
 
 
+    @Override
     public List<Double> getNumericValue() {
         List<Double> numericValues = new ArrayList<>();
         for (List<Integer> bits : bitsHolder) {
@@ -48,6 +61,7 @@ public class BitEntity implements Cloneable {
         return numericValues;
     }
 
+    @Override
     public void mutate() {
         List<Integer> bits = bitsHolder.get(RandomUtils.nextInt(0, bitsHolder.size()));
         int i = RandomUtils.nextInt(0, bits.size());
@@ -69,8 +83,12 @@ public class BitEntity implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BitEntity bitEntity = (BitEntity) o;
         return Objects.equals(bitsHolder, bitEntity.bitsHolder);
     }

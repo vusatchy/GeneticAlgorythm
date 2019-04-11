@@ -3,8 +3,8 @@ package service;
 import choose.Chooser;
 import evaluation.Evaluator;
 import manager.PopulationManager;
-import manager.SimplePopulationManager;
 import model.BitEntity;
+import model.Entity;
 import model.GeneticResult;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.tuple.Pair;
@@ -59,8 +59,8 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
     public GeneticResult findBestSolution() {
         GeneticResult result = new GeneticResult();
         int count = 0;
-        List<BitEntity> population = populationManager.initialPopulation();
-        Pair<Double, BitEntity> doubleBitEntityPair = bestSolution(population);
+        List<? extends Entity> population = populationManager.initialPopulation();
+        Pair<Double, Entity> doubleBitEntityPair = bestSolution(population);
         result.setBestPopulation(populationManager.lastPopulationIndex());
         result.setBestSolution(doubleBitEntityPair.getLeft());
         result.setBitEntity(doubleBitEntityPair.getRight());
@@ -86,13 +86,13 @@ public class GeneticAlgorithmService implements GeneticAlgorythm {
     }
 
     @Override
-    public List<Double> convert(BitEntity bitEntity) {
+    public List<Double> convert(Entity bitEntity) {
         return evaluator.convert(bitEntity, ranges);
     }
 
 
-    private Pair<Double, BitEntity> bestSolution(List<BitEntity> population) {
-        BitEntity entity = population.get(0);
+    private Pair<Double, Entity> bestSolution(List<? extends Entity> population) {
+        Entity entity = population.get(0);
         double max = evaluator.evaluate(entity, ranges);
         for (int i = 1; i < population.size(); i++) {
             double result = evaluator.evaluate(population.get(i), ranges);

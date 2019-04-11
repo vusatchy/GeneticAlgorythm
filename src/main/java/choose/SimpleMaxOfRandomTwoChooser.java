@@ -2,6 +2,7 @@ package choose;
 
 import evaluation.Evaluator;
 import model.BitEntity;
+import model.Entity;
 import org.apache.commons.lang3.Range;
 
 import java.util.List;
@@ -26,16 +27,16 @@ public class SimpleMaxOfRandomTwoChooser implements Chooser {
     }
 
     @Override
-    public BitEntity choose(List<BitEntity> population) {
+    public Entity choose(List<? extends Entity> population) {
         Random random = new Random();
-        BitEntity entity1 = population.get(random.nextInt(population.size()));
-        BitEntity entity2 = population.get(random.nextInt(population.size()));
+        Entity entity1 = population.get(random.nextInt(population.size()));
+        Entity entity2 = population.get(random.nextInt(population.size()));
         return evaluator.evaluate(entity1, ranges) >= evaluator.evaluate(entity2, ranges)
                 ? entity1 : entity2;
     }
 
     @Override
-    public double evaluate(BitEntity bitEntity) {
+    public double evaluate(Entity bitEntity) {
         return evaluator.evaluate(bitEntity, ranges);
     }
 }

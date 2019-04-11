@@ -1,11 +1,10 @@
 import choose.SimpleMaxOfRandomTwoChooser;
 import draw.Draw;
 import evaluation.Evaluator;
-import evaluation.KPowerEvaluatorDecorator;
 import evaluation.SimpleEvaluator;
 import evaluation.SystemSolverEvaluatorDecorator;
-import manager.ExpectedElitarModelPopulationManager;
-import manager.SimplePopulationManager;
+import manager.BitEntityPopulationManager;
+import manager.NumericEntityPopulationManager;
 import model.GeneticResult;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -16,8 +15,6 @@ import service.GeneticAlgorythm;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class App {
 
@@ -30,25 +27,27 @@ public class App {
         Evaluator evaluator = new SimpleEvaluator(Exersises.linear());
         Evaluator decorated = new SystemSolverEvaluatorDecorator(new SimpleEvaluator(), Exersises.snar);
         GeneticAlgorythm geneticAlgorithm = GeneticAlgorithmService.newAlgorithmBuilder()
-                .withPopulationSize(300) //8000
-                .wihtMutationPossibility(0.05)
-                .withSelectionPossibility(0.9)
-                .withRanges(Exersises.snarRanges)
-                .withSplittingSize((long) Math.pow(10, 9))
-                .withTimesWithoutChanges(500) //50
-                .maxIterations(2000) //50
-                .withEvaluator(decorated)
-                .withChooser(new SimpleMaxOfRandomTwoChooser(decorated))
-                .withPopulationManager(new SimplePopulationManager())
-                .build();
+            .withPopulationSize(300) //8000
+            .wihtMutationPossibility(0.05)
+            .withSelectionPossibility(0.9)
+            .withRanges(Exersises.snarRanges)
+            .withSplittingSize((long) Math.pow(10, 9))
+            .withTimesWithoutChanges(500) //50
+            .maxIterations(2000) //50
+            .withEvaluator(decorated)
+            .withChooser(new SimpleMaxOfRandomTwoChooser(decorated))
+            .withPopulationManager(new BitEntityPopulationManager())
+            .build();
 
+        long st = System.currentTimeMillis();
         GeneticResult results = geneticAlgorithm.findBestSolution();
-        LOGGER.info("Best result: {} on population № {} with value [{}]",
-                String.format(FORMAT, results.getBestSolution()),
-                results.getBestPopulation(),
-                format(geneticAlgorithm.convert(results.getBitEntity())));
+        LOGGER.info("Best result: {} in {} ms on population № {} with value [{}]",
+                    String.format(FORMAT, results.getBestSolution()),
+                    System.currentTimeMillis() - st,
+                    results.getBestPopulation(),
+                    format(geneticAlgorithm.convert(results.getBitEntity())));
 
-        GeneticAlgorythm geneticAlgorithmModern = GeneticAlgorithmService.newAlgorithmBuilder()
+       /* GeneticAlgorythm geneticAlgorithmModern = GeneticAlgorithmService.newAlgorithmBuilder()
                 .withPopulationSize(300) //8000
                 .wihtMutationPossibility(0.05)
                 .withSelectionPossibility(0.9)
@@ -59,14 +58,27 @@ public class App {
                 .withEvaluator(new KPowerEvaluatorDecorator(decorated, 1.005))
                 .withChooser(new SimpleMaxOfRandomTwoChooser(decorated))
                 .withPopulationManager(new ExpectedElitarModelPopulationManager(0.10))
-                .build();
+                .build(); */
+        GeneticAlgorythm geneticAlgorithmModern = GeneticAlgorithmService.newAlgorithmBuilder()
+            .withPopulationSize(300) //8000
+            .wihtMutationPossibility(0.05)
+            .withSelectionPossibility(0.9)
+            .withRanges(Exersises.snarRanges)
+            .withSplittingSize((long) Math.pow(10, 9))
+            .withTimesWithoutChanges(500) //50
+            .maxIterations(2000) //50
+            .withEvaluator(decorated)
+            .withChooser(new SimpleMaxOfRandomTwoChooser(decorated))
+            .withPopulationManager(new NumericEntityPopulationManager(Exersises.snarRanges))
+            .build();
 
-
+        st = System.currentTimeMillis();
         GeneticResult resultsModern = geneticAlgorithmModern.findBestSolution();
-        LOGGER.info("Best result: {} on population № {} with value [{}]",
-                String.format(FORMAT, resultsModern.getBestSolution()),
-                resultsModern.getBestPopulation(),
-                format(geneticAlgorithmModern.convert(resultsModern.getBitEntity())));
+        LOGGER.info("Best result: {} in {} ms on population № {} with value [{}]",
+                    String.format(FORMAT, resultsModern.getBestSolution()),
+                    System.currentTimeMillis() - st,
+                    resultsModern.getBestPopulation(),
+                    format(geneticAlgorithmModern.convert(resultsModern.getBitEntity())));
 
         Draw.drawLine(results.getGenerationResult(), Color.red);
 

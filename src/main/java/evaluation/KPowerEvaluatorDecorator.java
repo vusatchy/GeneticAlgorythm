@@ -1,6 +1,6 @@
 package evaluation;
 
-import model.BitEntity;
+import model.Entity;
 import org.apache.commons.lang3.Range;
 
 import java.util.List;
@@ -26,12 +26,12 @@ public class KPowerEvaluatorDecorator implements Evaluator {
     }
 
     @Override
-    public List<Double> convert(BitEntity bitEntity, List<Range<Double>> ranges) {
+    public List<Double> convert(Entity bitEntity, List<Range<Double>> ranges) {
         return evaluator.convert(bitEntity, ranges);
     }
 
     @Override
-    public double evaluate(BitEntity bitEntity, List<Range<Double>> range) {
+    public double evaluate(Entity bitEntity, List<Range<Double>> range) {
         return pow(evaluator.evaluate(bitEntity, range), k);
     }
 

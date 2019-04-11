@@ -1,16 +1,17 @@
 package manager;
 
 import choose.Chooser;
-import model.BitEntity;
+import model.Entity;
 
 import java.util.List;
 
 public interface PopulationManager {
-    List<BitEntity> mutateAndSelect(double mutationPossibility, double selectionPossibility);
+
+    List<? extends Entity> mutateAndSelect(double mutationPossibility, double selectionPossibility);
 
     int lastPopulationIndex();
 
-    List<BitEntity> initialPopulation();
+    List<? extends Entity> initialPopulation();
 
     void setChooser(Chooser chooser);
 

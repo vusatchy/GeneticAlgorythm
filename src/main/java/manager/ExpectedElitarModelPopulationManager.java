@@ -1,7 +1,7 @@
 package manager;
 
 import model.BitEntity;
-import org.apache.commons.lang3.RandomUtils;
+import model.Entity;
 import org.apache.commons.math3.util.Pair;
 import util.Roulette;
 
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 
-public class ExpectedElitarModelPopulationManager extends SimplePopulationManager {
+public class ExpectedElitarModelPopulationManager extends BitEntityPopulationManager {
 
     private double percentOfElitar;
 
@@ -58,8 +58,8 @@ public class ExpectedElitarModelPopulationManager extends SimplePopulationManage
                     bitEntity1 = lastPopulation.get(spin1);
                     bitEntity2 = lastPopulation.get(spin2);
                 }
-                BitEntity parent1 = BitEntity.of(bitEntity1.getBitsHolder());
-                BitEntity parent2 = BitEntity.of(bitEntity2.getBitsHolder());
+                BitEntity parent1 = BitEntity.of(bitEntity1);
+                BitEntity parent2 = BitEntity.of(bitEntity2);
                 BitEntity child1;
                 BitEntity child2;
 
@@ -72,8 +72,8 @@ public class ExpectedElitarModelPopulationManager extends SimplePopulationManage
                     evluated.set(spin2, evluated.get(spin2) - 1);
 
                 } else {
-                    child1 = BitEntity.of(parent1.getBitsHolder());
-                    child2 = BitEntity.of(parent2.getBitsHolder());
+                    child1 = BitEntity.of(parent1);
+                    child2 = BitEntity.of(parent2);
                 }
 
                 //mutate

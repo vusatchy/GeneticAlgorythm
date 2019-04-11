@@ -12,7 +12,7 @@ public class GeneticResult {
 
     private double bestSolution;
 
-    private BitEntity bitEntity;
+    private Entity entity;
 
     private Map<Integer, Double> generationResult = new HashMap<>();
 
@@ -36,12 +36,12 @@ public class GeneticResult {
         this.bestSolution = bestSolution;
     }
 
-    public BitEntity getBitEntity() {
-        return bitEntity;
+    public Entity getBitEntity() {
+        return entity;
     }
 
-    public void setBitEntity(BitEntity bitEntity) {
-        this.bitEntity = bitEntity;
+    public void setBitEntity(Entity entity) {
+        this.entity = entity;
     }
 
     public Map<Integer, Double> getGenerationResult() {
@@ -59,13 +59,13 @@ public class GeneticResult {
         GeneticResult that = (GeneticResult) o;
         return bestPopulation == that.bestPopulation &&
                 bestSolution == that.bestSolution &&
-                Objects.equals(bitEntity, that.bitEntity) &&
+                Objects.equals(entity, that.entity) &&
                 Objects.equals(generationResult, that.generationResult);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(bestPopulation, bestSolution, bitEntity, generationResult);
+        return Objects.hash(bestPopulation, bestSolution, entity, generationResult);
     }
 }

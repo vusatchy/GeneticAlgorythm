@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 import static java.util.concurrent.CompletableFuture.runAsync;
 
-public class SimplePopulationManager implements PopulationManager {
+public class BitEntityPopulationManager implements PopulationManager {
 
     protected Map<Integer, List<BitEntity>> populations = new HashMap<>();
     protected Chooser chooser;
@@ -22,14 +22,14 @@ public class SimplePopulationManager implements PopulationManager {
     protected List<Integer> dimensions;
     protected ExecutorService executorService = Executors.newCachedThreadPool();
 
-    public SimplePopulationManager(Chooser chooser, int populationSize, List<Integer> dimensions) {
+    public BitEntityPopulationManager(Chooser chooser, int populationSize, List<Integer> dimensions) {
         this.populationSize = populationSize;
         this.dimensions = dimensions;
         this.chooser = chooser;
         init();
     }
 
-    public SimplePopulationManager() {
+    public BitEntityPopulationManager() {
         init();
     }
 
@@ -51,8 +51,8 @@ public class SimplePopulationManager implements PopulationManager {
         CompletableFuture[] tasks = new CompletableFuture[populationSize / 2];
         for (int i = 0; i < populationSize / 2; i++) {
             tasks[i] = runAsync(() -> {
-                BitEntity parent1 = BitEntity.of(chooser.choose(lastPopulation).getBitsHolder());
-                BitEntity parent2 = BitEntity.of(chooser.choose(lastPopulation).getBitsHolder());
+                BitEntity parent1 = BitEntity.of(chooser.choose(lastPopulation));
+                BitEntity parent2 = BitEntity.of(chooser.choose(lastPopulation));
                 BitEntity child1;
                 BitEntity child2;
 
@@ -119,7 +119,7 @@ public class SimplePopulationManager implements PopulationManager {
         this.dimensions = dimensions;
     }
 
-    Pair<BitEntity, BitEntity> mergeEntities(BitEntity parent1, BitEntity parent2) {
+    protected Pair<BitEntity, BitEntity> mergeEntities(BitEntity parent1, BitEntity parent2) {
         List<List<Integer>> bitsHolder1 = parent1.getBitsHolder();
         List<List<Integer>> bitsHolder2 = parent2.getBitsHolder();
 
@@ -141,7 +141,7 @@ public class SimplePopulationManager implements PopulationManager {
             );
         }
         CompletableFuture.allOf(tasks).join();
-        return Pair.create(BitEntity.of(bitsHolderResult1), BitEntity.of(bitsHolderResult2));
+        return Pair.create(BitEntity.of(BitEntity.of(bitsHolderResult1)), BitEntity.of(bitsHolderResult2));
     }
 
 
