@@ -3,7 +3,6 @@ package service;
 import choose.Chooser;
 import evaluation.Evaluator;
 import manager.PopulationManager;
-import model.BitEntity;
 import model.Entity;
 import model.GeneticResult;
 import org.apache.commons.lang3.Range;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GeneticAlgorithmService implements GeneticAlgorythm {
+public class GeneticAlgorithmService implements GeneticAlgorithm {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneticAlgorithmService.class);
 

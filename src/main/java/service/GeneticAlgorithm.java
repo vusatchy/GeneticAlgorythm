@@ -6,7 +6,7 @@ import model.GeneticResult;
 
 import java.util.List;
 
-public interface GeneticAlgorythm {
+public interface GeneticAlgorithm {
 
     GeneticResult findBestSolution();
 

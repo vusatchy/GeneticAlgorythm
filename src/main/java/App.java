@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.GeneticAlgorithmService;
-import service.GeneticAlgorythm;
+import service.GeneticAlgorithm;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class App {
     public static void main(String[] args) {
         Evaluator evaluator = new SimpleEvaluator(Exersises.linear());
         Evaluator decorated = new SystemSolverEvaluatorDecorator(new SimpleEvaluator(), Exersises.snar);
-        GeneticAlgorythm geneticAlgorithm = GeneticAlgorithmService.newAlgorithmBuilder()
+        GeneticAlgorithm geneticAlgorithm = GeneticAlgorithmService.newAlgorithmBuilder()
             .withPopulationSize(300) //8000
             .wihtMutationPossibility(0.05)
             .withSelectionPossibility(0.9)
@@ -59,7 +59,7 @@ public class App {
                 .withChooser(new SimpleMaxOfRandomTwoChooser(decorated))
                 .withPopulationManager(new ExpectedElitarModelPopulationManager(0.10))
                 .build(); */
-        GeneticAlgorythm geneticAlgorithmModern = GeneticAlgorithmService.newAlgorithmBuilder()
+        GeneticAlgorithm geneticAlgorithmModern = GeneticAlgorithmService.newAlgorithmBuilder()
             .withPopulationSize(300) //8000
             .wihtMutationPossibility(0.01)
             .withSelectionPossibility(0.9)
