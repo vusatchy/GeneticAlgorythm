@@ -61,7 +61,7 @@ public class App {
                 .build(); */
         GeneticAlgorythm geneticAlgorithmModern = GeneticAlgorithmService.newAlgorithmBuilder()
             .withPopulationSize(300) //8000
-            .wihtMutationPossibility(0.05)
+            .wihtMutationPossibility(0.01)
             .withSelectionPossibility(0.9)
             .withRanges(Exersises.snarRanges)
             .withSplittingSize((long) Math.pow(10, 9))

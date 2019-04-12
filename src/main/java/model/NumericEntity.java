@@ -1,6 +1,8 @@
 package model;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Range;
+import util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +13,7 @@ public class NumericEntity implements Cloneable, Entity {
 
     public NumericEntity(List<Range<Double>> ranges) {
         ranges.forEach(range -> {
-            double val = range.getMaximum() - Math.random() * (range.getMaximum() - range.getMinimum());
-            values.add(val);
+            values.add(Util.random(range));
         });
     }
 
@@ -43,8 +44,14 @@ public class NumericEntity implements Cloneable, Entity {
         return values;
     }
 
+    public void mutate(List<Range<Double>> ranges) {
+        int i = RandomUtils.nextInt(0, values.size());
+        values.set(i, Util.random(ranges.get(i)));
+    }
+
     @Override
     public void mutate() {
 
     }
+
 }

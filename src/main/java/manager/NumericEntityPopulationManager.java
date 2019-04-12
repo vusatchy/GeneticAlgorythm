@@ -7,6 +7,7 @@ import model.Entity;
 import model.NumericEntity;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.math3.util.Pair;
+import util.Util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,11 +65,11 @@ public class NumericEntityPopulationManager implements PopulationManager {
                 }
 
                 //mutate
-                if (mutationPossibility < Math.random()) {
-                    child2.mutate();
+                if (mutationPossibility > Math.random() ) {
+                    child2.mutate(ranges);
                 }
-                if (mutationPossibility < Math.random()) {
-                    child1.mutate();
+                if (mutationPossibility > Math.random()) {
+                    child1.mutate(ranges);
                 }
 
                 newPopulation.add(child1);
@@ -87,14 +88,8 @@ public class NumericEntityPopulationManager implements PopulationManager {
         List<Double> parentValues1 = parent1.getNumericValue();
         List<Double> parentValues2 = parent2.getNumericValue();
         for (int i = 0; i < parentValues1.size(); i++) {
-            double val1 = Math.max(parentValues1.get(i), parentValues2.get(i)) - Math.random() * (
-                    Math.max(parentValues1.get(i), parentValues2.get(i)) - Math
-                        .min(parentValues1.get(i), parentValues2.get(i)));
-            double val2 = Math.max(parentValues1.get(i), parentValues2.get(i)) - Math.random() * (
-                    Math.max(parentValues1.get(i), parentValues2.get(i)) - Math
-                        .min(parentValues1.get(i), parentValues2.get(i)));
-            values1.add(val1);
-            values2.add(val2);
+            values1.add(Util.random(parentValues1.get(i), parentValues2.get(i)));
+            values2.add(Util.random(parentValues1.get(i), parentValues2.get(i)));
         }
         return Pair.create(NumericEntity.of(values1), NumericEntity.of(values2));
     }
